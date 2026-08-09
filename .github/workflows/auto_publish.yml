@@ -2,159 +2,160 @@ name: Auto Publish Videos
 
 on:
   schedule:
-    # Run 3 times a day at:
-    # - 8:00 AM UTC
+     # Run 3 times a day at:
+    # - 8:00 AM UTC 
     # - 4:00 PM UTC
     # - 12:00 AM UTC
-    - cron: '0 8 * * *'
-    - cron: '0 16 * * *'
+     - cron: '0 8 * * *'
+    - cron: '0 16 * * *' 
     - cron: '0 0 * * *'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:  # Allow manual trigger
 
 permissions:
-  contents: write
+  conte nts: write
 
 jobs:
   publish-videos:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30  # Prevent hanging
+    runs- on: ubuntu-latest
+    timeout-minutes: 30  #  Prevent hanging
     
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
+      - name:  Checkout repository
+        uses: actions/ch eckout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
+         uses: actions/setup-python@v6
+        with: 
           python-version: '3.11'
-          cache: 'pip'  # Cache pip dependencies for faster runs
+          c ache: 'pip'  # Cache pip dependencies for fas ter runs
       
       - name: Install FFmpeg
-        run: |
+         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg
-      
+           sudo apt-get install -y ffmpeg
+       
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+         run: |
+          python -m pip install --upg rade pip
+          pip install -r requirement s.txt
       
-      - name: Check required secrets
+      - name: Check required sec rets
         run: |
-          echo "Checking required environment variables..."
-          echo ""
-          echo "=== CRITICAL SECRETS (Required) ==="
+          echo "Checking  required environment variables..."
+           echo ""
+          echo "=== CRITICAL SECRETS  (Required) ==="
           critical_secrets=(
-            "POLLINATIONS_API_KEY"
-          )
+             "POLLINATIONS_API_KEY"
+           )
 
           critical_missing=0
-          for secret in "${critical_secrets[@]}"; do
-            if [ -z "${!secret}" ]; then
-              echo "❌ Missing: $secret"
-              critical_missing=1
+          for  secret in "${critical_secrets[@]}"; do
+             if [ -z "${!secret}" ]; then
+               echo "❌ Missing: $secret"
+               critical_missing=1
             else
-              echo "✅ Found: $secret"
-            fi
+               echo "✅ Found: $secret"
+             fi
           done
 
           echo ""
-          echo "=== OPTIONAL SECRETS (Will skip if missing) ==="
+           echo "=== OPTIONAL SECRETS (Will skip if mi ssing) ==="
           optional_secrets=(
-            "DROPBOX_APP_KEY"
-            "DROPBOX_APP_SECRET"
-            "DROPBOX_REFRESH_TOKEN"
+             "DROPBOX_APP_KEY"
+            "DROPBO X_APP_SECRET"
+            "DROPBOX_REFRESH_TO KEN"
             "INSTAGRAM_ACCESS_TOKEN"
-            "INSTAGRAM_ACCOUNT_ID"
-            "FACEBOOK_ACCESS_TOKEN"
-            "FACEBOOK_PAGE_ID"
+             "INSTAGRAM_ACCOUNT_ID"
+            " FACEBOOK_ACCESS_TOKEN"
+            "FACEBOOK_ PAGE_ID"
             "THREADS_ACCESS_TOKEN"
-            "THREADS_USER_ID"
+             "THREADS_USER_ID"
           )
 
-          for secret in "${optional_secrets[@]}"; do
-            if [ -z "${!secret}" ]; then
-              echo "⚠️  Optional (not set): $secret"
+           for secret in "${optional_secrets[@]}" ; do
+            if [ -z "${!secret}" ]; then 
+              echo "⚠️  Optional (not se t): $secret"
             else
-              echo "✅ Found: $secret"
+              e cho "✅ Found: $secret"
             fi
-          done
+           done
 
           echo ""
-          if [ $critical_missing -eq 1 ]; then
-            echo "❌ Critical secrets are missing! Pipeline cannot continue."
+          if [ $ critical_missing -eq 1 ]; then
+            ec ho "❌ Critical secrets are missing! Pipelin e cannot continue."
             exit 1
-          fi
+           fi
 
-          echo "✅ Critical secrets present. Continuing with available platforms..."
+          echo "✅ Critical secrets  present. Continuing with available platforms. .."
         env:
-          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
-          DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
-          DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
-          DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
-          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
-          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
-          FACEBOOK_ACCESS_TOKEN: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
-          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          POLLINATIONS_API_K EY: ${{ secrets.POLLINATIONS_API_KEY }}
+           DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP _KEY }}
+          DROPBOX_APP_SECRET: ${{ sec rets.DROPBOX_APP_SECRET }}
+          DROPBOX_ REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TO KEN }}
+          INSTAGRAM_ACCESS_TOKEN: ${{  secrets.INSTAGRAM_ACCESS_TOKEN }}
+          I NSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_AC COUNT_ID }}
+          FACEBOOK_ACCESS_TOKEN:  ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+           FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE _ID }}
+          GITHUB_TOKEN: ${{ secrets.GI THUB_TOKEN }}
+          THREADS_ACCESS_TOKEN:  ${{ secrets.THREADS_ACCESS_TOKEN }}
+           THREADS_USER_ID: ${{ secrets.THREADS_USER_I D }}
       
-      - name: Run automation pipeline
+      - name: Run automation pipe line
         env:
           # Google Drive
-          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
-          GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+           GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.G OOGLE_DRIVE_FOLDER_ID }}
+          GOOGLE_SER VICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ ACCOUNT_KEY }}
 
           # Instagram
-          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
-          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAG RAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOU NT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
 
-          # Facebook
-          FACEBOOK_ACCESS_TOKEN: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
-          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           # Facebook
+          FACEBOOK_ACCESS _TOKEN: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+           FACEBOOK_PAGE_ID: ${{ secrets.FACEB OOK_PAGE_ID }}
+          GITHUB_TOKEN: ${{ se crets.GITHUB_TOKEN }}
 
           # Threads
-          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+           THREADS_ACCESS_TOKEN: ${{ secrets.THR EADS_ACCESS_TOKEN }}
+          THREADS_USER_I D: ${{ secrets.THREADS_USER_ID }}
 
-          # YouTube (optional)
-          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
-          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
-          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+           # YouTube (optional)
+          YT_CLIENT_ID:  ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIE NT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+           YT_REFRESH_TOKEN: ${{ secrets.YT_REFR ESH_TOKEN }}
 
           # AI Caption
-          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
+           POLLINATIONS_API_KEY: ${{ secrets.POLLINATI ONS_API_KEY }}
           AI_MODEL: openai
-        run: |
-          echo "Starting automation pipeline..."
-          echo "Google Drive Folder: $GOOGLE_DRIVE_FOLDER_ID"
-          echo "Service Account Key: ${GOOGLE_SERVICE_ACCOUNT_KEY:0:20}..."
-          python auto_pipeline.py
+         run: |
+          echo "Starting automati on pipeline..."
+          echo "Google Drive  Folder: $GOOGLE_DRIVE_FOLDER_ID"
+          ec ho "Service Account Key: ${GOOGLE_SERVICE_ACC OUNT_KEY:0:20}..."
+          python auto_pipe line.py
           exit_code=$?
 
-          if [ $exit_code -ne 0 ]; then
-            echo "❌ Pipeline failed with exit code $exit_code"
+          if  [ $exit_code -ne 0 ]; then
+            echo " ❌ Pipeline failed with exit code $exit_code "
             exit $exit_code
           fi
 
-          echo "✅ Pipeline completed successfully"
+           echo "✅ Pipeline completed success fully"
       
-      - name: Commit published videos log
+      - name: Commit published  videos log
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git confi g --local user.email "action@github.com"
+           git config --local user.name "GitHub Ac tion"
           
-          # Add only the log file (not large video files)
-          git add published_videos.json 2>/dev/null || true
-          
-          # Only commit if there are changes
-          if ! git diff --staged --quiet; then
-            git commit -m "Update published videos log [skip ci]"
-            git pull --rebase
+          # Add only the log  file (not large video files)
+          git a dd published_videos.json 2>/dev/null || true
+           
+          # Only commit if there a re changes
+          if ! git diff --staged - -quiet; then
+            git commit -m "Updat e published videos log [skip ci]"
+             git pull --rebase
             git push
-            echo "✅ Committed and pushed published_videos.json"
+             echo "✅ Committed and pushed publish ed_videos.json"
           else
-            echo "ℹ️ No changes to commit"
-          fi
+            ec ho "ℹ️ No changes to commit"
+          fi 
+ 
